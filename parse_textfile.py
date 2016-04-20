@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import datetime
 
-def run(textfile_name, hours_behind_UTC):
+def run(textfile_name, hours_behind_UTC, textfile_path=None, parsedfile_path=None):
 
     """
     Takes in a downloaded textfile and parses it into a data frame with integers (starting at 0) for indices and 5 columns:
@@ -16,11 +16,13 @@ def run(textfile_name, hours_behind_UTC):
     """
 
     wd = os.getcwd()
-    textfile_path = wd + r'\Text Files'
-    parsedfile_path = wd + r'\Parsed Files'
+    if textfile_path == None:
+        textfile_path = wd + r'\Text Files'
+    if parsedfile_path == None:
+        parsedfile_path = wd + r'\Parsed Files'
+
     temp_scaling_factor = 10.
     ExistingParsedFiles = os.listdir(parsedfile_path)
-
 
     if textfile_name + '_parsed.csv' in ExistingParsedFiles:
         print 'Parsed file already exists.'

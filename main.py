@@ -3,6 +3,7 @@ __author__ = 'brendan'
 import parse_textfile
 import parsed_to_timestep
 import zip_to_txt
+import time
 
 #Inputs:
 """
@@ -27,6 +28,7 @@ list_of_filestrings = ['724800-23157-2010']
 HoursBehindUTC = 8
 
 #main:
+start = time.time()
 for filename in list_of_filestrings:
     # (1) Convert gzip file to txt file
     zip_to_txt.run(filename)
@@ -36,3 +38,6 @@ for filename in list_of_filestrings:
 
     # (3) Convert parsed dataframe to specified timeframe CSV
     parsed_to_timestep.run(filename,data_frame)
+end = time.time()
+elapsed = end - start
+print 'Timestepping program took %s sec (%s min) to run.'%(elapsed,elapsed/60)

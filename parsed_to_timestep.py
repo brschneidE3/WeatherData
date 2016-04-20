@@ -24,43 +24,52 @@ def run(filename,input_dataframe=None,
     if output_path == None:
         output_path = wd + r'\Timestep Files'
 
-    #Create our output dataframe
-    start_datetime = datetime.datetime.combine(datetime.date(start_year,start_month,start_day),
-                                               datetime.time(start_hour,start_minute))
-    datetimes = pd.date_range(start_datetime,freq=frequency,periods=num_periods)
-    timestep_df = pd.DataFrame(index=datetimes,columns=['Actual Time Used', 'Temp (C)'])
+    WBAN_ID = filename.rsplit('-')[1]
+    output_filename = '%s_%s-%s-%s_freq%s_n%s'%(WBAN_ID,start_year,start_month,start_day,frequency,num_periods)
+    if output_filename in os.listdir(output_path):
+        print "File already created."
+        exit()
+
+    else:
+        print "Timestep file not detected."
+
+        #Create our output dataframe
+        start_datetime = datetime.datetime.combine(datetime.date(start_year,start_month,start_day),
+                                                   datetime.time(start_hour,start_minute))
+        datetimes = pd.date_range(start_datetime,freq=frequency,periods=num_periods)
+        timestep_df = pd.DataFrame(index=datetimes,columns=['Actual Time Used', 'Temp (C)'])
 
 
-    if input_dataframe == None:
-        print '...Building dataframe from parsed CSV...'
-        input_dataframe = CreateDataframeFromParsedfile(filename,parsed_file_path)
+        if input_dataframe == None:
+            print '...Building dataframe from parsed CSV...'
+            input_dataframe = CreateDataframeFromParsedfile(filename,parsed_file_path)
 
 
-    timestep_counter = 0
-    for timestep in timestep_df.index:
+        timestep_counter = 0
+        for timestep in timestep_df.index:
 
-        greatest_earlier_timestep = max(input_dataframe[ input_dataframe['Custom Datetime'] <= timestep ]['Custom Datetime'])
-        greatest_earlier_temp = max(input_dataframe[input_dataframe['Custom Datetime']==greatest_earlier_timestep]['Temp (C)'])
-
-        while greatest_earlier_temp == '#N/A':
-            greatest_earlier_timestep = max(input_dataframe[ input_dataframe['Custom Datetime'] < greatest_earlier_timestep ]['Custom Datetime'])
+            greatest_earlier_timestep = max(input_dataframe[ input_dataframe['Custom Datetime'] <= timestep ]['Custom Datetime'])
             greatest_earlier_temp = max(input_dataframe[input_dataframe['Custom Datetime']==greatest_earlier_timestep]['Temp (C)'])
 
-        timestep_df.loc[timestep] = [greatest_earlier_timestep, greatest_earlier_temp]
+            while greatest_earlier_temp == '#N/A':
+                greatest_earlier_timestep = max(input_dataframe[ input_dataframe['Custom Datetime'] < greatest_earlier_timestep ]['Custom Datetime'])
+                greatest_earlier_temp = max(input_dataframe[input_dataframe['Custom Datetime']==greatest_earlier_timestep]['Temp (C)'])
 
-        if timestep_counter%1000 == 0:
-            print 'Corresponding temperature for timestep %s of %s found.'%(timestep_counter,num_periods)
-        timestep_counter += 1
+            timestep_df.loc[timestep] = [greatest_earlier_timestep, greatest_earlier_temp]
 
-    unique_timesteps_used = float(len(timestep_df['Actual Time Used'].value_counts()))
-    data_density_metric = unique_timesteps_used / num_periods
-    timestep_df.loc['Unique Timesteps Used'] = [unique_timesteps_used, '']
-    timestep_df.loc['Data Density'] = [data_density_metric, '']
+            if timestep_counter%1000 == 0:
+                print 'Corresponding temperature for timestep %s of %s found.'%(timestep_counter,num_periods)
+            timestep_counter += 1
 
-    timestep_df.to_csv(path_or_buf= output_path + r'\%s_timestepped.csv'%filename,
-                       columns=['Actual Time Used', 'Temp (C)'])
+        unique_timesteps_used = float(len(timestep_df['Actual Time Used'].value_counts()))
+        data_density_metric = unique_timesteps_used / num_periods
+        timestep_df.loc['Unique Timesteps Used'] = [unique_timesteps_used, '']
+        timestep_df.loc['Data Density'] = [data_density_metric, '']
 
-    return timestep_df
+        timestep_df.to_csv(path_or_buf= output_path + r'\%s.csv'%output_filename,
+                           columns=['Actual Time Used', 'Temp (C)'])
+
+        return timestep_df
 
 def CreateDataframeFromParsedfile(filename,Parsedfile_path=None):
     """
