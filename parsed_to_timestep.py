@@ -26,7 +26,7 @@ def run(filename,input_dataframe=None,
 
     WBAN_ID = filename.rsplit('-')[1]
     output_filename = '%s_%s-%s-%s_freq%s_n%s'%(WBAN_ID,start_year,start_month,start_day,frequency,num_periods)
-    if output_filename in os.listdir(output_path):
+    if output_filename + '.csv' in os.listdir(output_path):
         print "File already created."
         exit()
 
@@ -40,7 +40,7 @@ def run(filename,input_dataframe=None,
         timestep_df = pd.DataFrame(index=datetimes,columns=['Actual Time Used', 'Temp (C)'])
 
 
-        if input_dataframe == None:
+        if input_dataframe is None:
             print '...Building dataframe from parsed CSV...'
             input_dataframe = CreateDataframeFromParsedfile(filename,parsed_file_path)
 

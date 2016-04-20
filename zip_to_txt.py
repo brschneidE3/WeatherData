@@ -11,7 +11,7 @@ def run(gzip_filename,gzip_directory=None,txtFile_directory=None):
 
     wd = os.getcwd()
     if gzip_directory == None:
-        gzipFile_path = wd + r'\Zip Files'
+        gzipFile_path = wd + r'\ZipFiles'
     else:
         gzipFile_path = gzip_directory
     if txtFile_directory == None:

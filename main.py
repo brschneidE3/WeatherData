@@ -4,6 +4,7 @@ import parse_textfile
 import parsed_to_timestep
 import zip_to_txt
 import time
+import download_gzip
 
 #Inputs:
 """
@@ -23,13 +24,16 @@ list_of_filestrings = ['722868-93138-2010',
 list_of_filestrings = ['722900-23188-2010',
                         '723805-23179-2010']
 """
-list_of_filestrings = ['724800-23157-2010']
-
+list_of_filestrings = ['010010-99999-2010']
 HoursBehindUTC = 8
 
 #main:
 start = time.time()
 for filename in list_of_filestrings:
+    # (0) TODO: download zip file solely from text string
+    # http://www1.ncdc.noaa.gov/pub/data/noaa/2014/010100-99999-2014.gz
+    download_gzip.run(filename)
+
     # (1) Convert gzip file to txt file
     zip_to_txt.run(filename)
 
