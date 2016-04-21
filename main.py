@@ -24,18 +24,21 @@ list_of_filestrings = ['722868-93138-2010',
 list_of_filestrings = ['722900-23188-2010',
                         '723805-23179-2010']
 """
-list_of_filestrings = ['010010-99999-2010']
+list_of_filestrings = ['723965-93209-20108',
+                       '723965-93209-2010']
 HoursBehindUTC = 8
 
 #main:
 start = time.time()
 for filename in list_of_filestrings:
-    # (0) TODO: download zip file solely from text string
-    # http://www1.ncdc.noaa.gov/pub/data/noaa/2014/010100-99999-2014.gz
+    # (0) http://www1.ncdc.noaa.gov/pub/data/noaa/2014/010100-99999-2014.gz
     download_gzip.run(filename)
 
     # (1) Convert gzip file to txt file
-    zip_to_txt.run(filename)
+    gzip_download = zip_to_txt.run(filename)
+    #Skip files that fail to download
+    if gzip_download == False:
+        continue
 
     # (2) Convert txt file to parsed csv & dataframe
     data_frame = parse_textfile.run(filename,HoursBehindUTC)
@@ -44,4 +47,4 @@ for filename in list_of_filestrings:
     parsed_to_timestep.run(filename,data_frame)
 end = time.time()
 elapsed = end - start
-print 'Timestepping program took %s sec (%s min) to run.'%(elapsed,elapsed/60)
+print 'Timestepping program took %s sec (%s min) to run.'%(str(elapsed)[:5],str(elapsed/60)[:5])

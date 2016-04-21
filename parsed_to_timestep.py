@@ -28,7 +28,7 @@ def run(filename,input_dataframe=None,
     output_filename = '%s_%s-%s-%s_freq%s_n%s'%(WBAN_ID,start_year,start_month,start_day,frequency,num_periods)
     if output_filename + '.csv' in os.listdir(output_path):
         print "File already created."
-        exit()
+        return 0
 
     else:
         print "Timestep file not detected."
@@ -65,6 +65,8 @@ def run(filename,input_dataframe=None,
         data_density_metric = unique_timesteps_used / num_periods
         timestep_df.loc['Unique Timesteps Used'] = [unique_timesteps_used, '']
         timestep_df.loc['Data Density'] = [data_density_metric, '']
+
+        print "Data density metric: ", data_density_metric
 
         timestep_df.to_csv(path_or_buf= output_path + r'\%s.csv'%output_filename,
                            columns=['Actual Time Used', 'Temp (C)'])

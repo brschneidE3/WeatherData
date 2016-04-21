@@ -23,10 +23,16 @@ def run(gzip_filename,gzip_directory=None,txtFile_directory=None):
     if gzip_filename + '.txt' in ExistingTextFiles:
         print 'Text file already created.'
     else:
-        with gzip.open(gzipFile_path + r'\%s.gz'%gzip_filename,'rb') as gzip_file:
-            file_content = gzip_file.read()
-            gzip_file.close()
+        try:
+            with gzip.open(gzipFile_path + r'\%s.gz'%gzip_filename,'rb') as gzip_file:
+                file_content = gzip_file.read()
+                gzip_file.close()
 
-        with open(txtFile_path + r'\%s.txt'%gzip_filename,'w') as txt_file:
-            txt_file.write(file_content)
-            txt_file.close()
+            with open(txtFile_path + r'\%s.txt'%gzip_filename,'w') as txt_file:
+                txt_file.write(file_content)
+                txt_file.close()
+        except IOError:
+            print "Sorry, %s cannot be found on NOAA server."%gzip_filename
+            os.remove(gzipFile_path + r'\%s.gz'%gzip_filename)
+            return False
+    return True
